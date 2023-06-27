@@ -1,18 +1,19 @@
 import { Module } from '@nestjs/common';
 // Controller
-import { GalleryController } from './gallery.controller';
+import { PictureController } from './picture.controller';
 // Module
 import { HttpModule } from '@nestjs/axios';
 // Provider
 import { ApiConfigProvider } from '../../configs/api.config';
 // Repository
 import { NasaApiRepository } from '../api.repository';
+import { PictureRepository } from './picture.repository';
 // Service
-import { GalleryService } from './gallery.service';
+import { PictureService } from './picture.service';
 
 @Module({
   imports: [HttpModule.registerAsync({ useClass: ApiConfigProvider })],
-  controllers: [GalleryController],
-  providers: [GalleryService, NasaApiRepository]
+  controllers: [PictureController],
+  providers: [PictureService, NasaApiRepository, PictureRepository]
 })
-export class GalleryModule {}
+export class PictureModule {}

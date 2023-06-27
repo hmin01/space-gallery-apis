@@ -5,7 +5,7 @@ import { BadRequestException, InternalServerErrorException, RequestTimeoutExcept
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 // Type
-import type { AxiosError, AxiosResponse } from 'axios';
+import type { AxiosError } from 'axios';
 import { catchError, firstValueFrom } from 'rxjs';
 
 @Injectable()
@@ -30,10 +30,13 @@ export class NasaApiRepository {
       switch (err.response.status) {
         case 400:
           error = new BadRequestException(message);
+          break;
         case 403:
           error = new UnauthorizedException(message);
+          break;
         default:
           error = new InternalServerErrorException();
+          break;
       }
       // 반환 여부에 따른 처리
       if (isReturn) return error;
