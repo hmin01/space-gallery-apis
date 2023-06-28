@@ -1,15 +1,24 @@
 import { Controller, Param, Res } from '@nestjs/common';
 // Express
 import { Response } from 'express';
+// Interface
+import { Picture, PictureImage } from './picture.interface';
 // Method
 import { Get } from '@nestjs/common';
 // Service
 import { PictureService } from './picture.service';
-import { Picture } from './picture.interface';
 
 @Controller('picture')
 export class PictureController {
   constructor(private pictureService: PictureService) {}
+
+  @Get('/image/list')
+  async getImages(): Promise<PictureImage[]> {
+    // URL 조회
+    const list: Picture[] = await this.pictureService.findMany();
+    // 리다이렉션
+    return list.map((elem: Picture): PictureImage => ({ date: elem.date, id: elem.id, url: elem.url }));
+  }
 
   @Get('/image/:date')
   async getImage(@Param('date') date: string, @Res() res: Response): Promise<any> {
@@ -21,7 +30,7 @@ export class PictureController {
 
   @Get('/info/list')
   findMany(): Promise<Picture[]> {
-    return this.pictureService.findMany(10);
+    return this.pictureService.findMany();
   }
 
   @Get('/info/:date')

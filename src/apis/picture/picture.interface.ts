@@ -15,3 +15,9 @@ export class Picture extends Item {
   title: string;
   url: string;
 }
+
+export class PictureImage {
+  date: string;
+  id: string;
+  url: string;
+}

@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+// Exception
+import { NotAcceptableException } from '@nestjs/common/exceptions';
 // Interface
 import { Picture } from './picture.interface';
 // Repository
@@ -20,14 +22,14 @@ export class PictureService {
     // 조회 결과가 있을 경우, 해당 정보 반환
     if (picture) return picture;
 
-    // 없을 경우, NASA API를 통해 요청
-    try {
-      // 데이터 요청
-      const { data } = await this.nasaApiRepository.getInfo(date);
+    // 데이터 요청
+    const { data } = await this.nasaApiRepository.getInfo(date);
+    // 타입이 이미지일 경우에만 처리
+    if (data.media_type === 'image') {
       // 결과 저장 및 반환
       return await this.pictureRepository.create({ date: data.date, explanation: data.explanation, title: data.title, url: data.url });
-    } catch (err: any) {
-      this.nasaApiRepository.catchError(err);
+    } else {
+      throw new NotAcceptableException();
     }
   }
   /**
