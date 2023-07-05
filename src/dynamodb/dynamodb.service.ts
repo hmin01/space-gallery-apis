@@ -3,13 +3,9 @@ import { Injectable } from '@nestjs/common';
 import * as dynamoose from 'dynamoose';
 // Service
 import { ConfigService } from '@nestjs/config';
-// Type
-import type { DynamoDB } from "@aws-sdk/client-dynamodb";
 
 @Injectable()
 export class DynamodbService {
-  private ddb: DynamoDB;
-
   constructor(private configService: ConfigService) {
     // Create
     const ddb = new dynamoose.aws.ddb.DynamoDB({

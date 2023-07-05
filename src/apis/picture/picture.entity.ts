@@ -1,8 +1,6 @@
 import { model, Schema } from 'dynamoose';
 // Interface
 import { Picture } from './picture.interface';
-// Utilities
-import { v4 as uuid } from 'uuid';
 
 const PictureSchema = new Schema({
   date: {
