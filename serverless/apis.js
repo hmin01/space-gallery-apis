@@ -10,9 +10,6 @@ const client = new DynamoDBClient({});
 // DynamoDB 데이터 유형을 JavaScript 데이터 유형으로 변환하여 CRUD를 수행할 수 있도록 래핑(Wrapping) 라이브러리를 통한 클라이언트 객체 생성
 const dynamodb = DynamoDBDocumentClient.from(client);
 
-// 테이블 이름
-const TABLE_NAME = "Picture";
-
 /** 메인 이벤트 핸들러 */
 export const handler = async (event) => {
   // 응답 바디
@@ -40,7 +37,7 @@ export const handler = async (event) => {
             if (data.media_type !== "image") throw new Error("Invalid media type");
             // 명령 생성
             command = new PutCommand({
-              TableName: TABLE_NAME,
+              TableName: process.env.TABLE_NAME,
               Item: {
                 date: data.date,
                 explanation: data.explanation,
@@ -72,7 +69,7 @@ export const handler = async (event) => {
       case "GET /pictures":
         // 데이터 조회를 위한 명령 생성
         command = new ScanCommand({
-          TableName: TABLE_NAME
+          TableName: process.env.TABLE_NAME
         });
         // 데이터 조회
         result = await dynamodb.send(command);
@@ -106,7 +103,7 @@ async function findByDate(date) {
   
   // 데이터 조회를 위한 명령 생성
   const command = new GetCommand({
-    TableName: TABLE_NAME,
+    TableName: process.env.TABLE_NAME,
     Key: {
       id: md5(date)
     }
