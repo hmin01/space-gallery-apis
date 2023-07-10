@@ -3,6 +3,7 @@ import { DynamoDBDocumentClient, GetCommand, PutCommand, ScanCommand } from "@aw
 // Axios
 import axios from "axios";
 // Utiltites
+import jimp from "jimp";
 import md5 from "md5";
 
 // 클라이언트 생성
@@ -35,14 +36,23 @@ export const handler = async (event) => {
           if (data) {
             // 미디어 타입이 이미지인 경우에만 처리
             if (data.media_type !== "image") throw new Error("Invalid media type");
+            
+            // 이미지 DataUrl 생성
+            const image = await jimp.read(data.url);
+            // 이미지 변환
+            image.resize(8, 6, jimp.RESIZE_BEZIER);
+            // Base64 변환
+            const dataUrl = await image.getBase64Async(jimp.AUTO);
+            
             // 명령 생성
             command = new PutCommand({
               TableName: process.env.TABLE_NAME,
               Item: {
+                dataUrl,
                 date: data.date,
                 explanation: data.explanation,
-                id: md5(param),
-                timestamp: new Date(param).getTime() / 1000,
+                id: md5(data.date),
+                timestamp: new Date(data.date).getTime() / 1000,
                 title: data.title,
                 url: data.url,
               }
@@ -61,8 +71,10 @@ export const handler = async (event) => {
       case "GET /picture/{date}":
         // 경로 파라미터 추출
         param = event.pathParameters.date;
+        // 날짜 형식 문자열
+        const date = getDateFormat(param);
         // 데이터 조회
-        result = await findByDate(param);
+        result = await findByDate(date);
         // 결과 반환
         if (result) body = result;
         break;
@@ -74,7 +86,7 @@ export const handler = async (event) => {
         // 데이터 조회
         result = await dynamodb.send(command);
         // 결과 반환
-        if (result.Count) body = result.Items;
+        if (result.Count) body = result.Items.sort((a, b) => b.timestamp - a.timestamp);
         else body = [];
         break;
       default:
@@ -110,9 +122,15 @@ async function findByDate(date) {
   });
   // 데이터 조회
   const result = await dynamodb.send(command);
-  console.log("item", result.Item);
   // 결과 반환
   return result.Item ? result.Item : undefined;
+}
+
+function getDateFormat(timestamp) {
+  // 날짜 객체 생성
+  const date = new Date(timestamp * 1000);
+  // 날짜 형식 문자열 반환
+  return `${date.getFullYear()}-${date.getMonth() + 1 > 9 ? date.getMonth() + 1 : "0" + (date.getMonth() + 1)}-${date.getDate() > 9 ? date.getDate() : "0" + date.getDate()}`;
 }
 
 function validateDateFormat(value) {
