@@ -10,7 +10,7 @@ export class ApiConfigProvider implements HttpModuleOptionsFactory {
   createHttpOptions(): HttpModuleOptions {
     return {
       baseURL: `https://api.nasa.gov/planetary`,
-      timeout: 8000
+      timeout: 15000
     };
   }
 }

@@ -3,12 +3,14 @@ import { Module } from '@nestjs/common';
 import { envConfig } from './configs/env.config';
 // Module
 import { ConfigModule } from '@nestjs/config';
-import { GalleryModule } from './apis/gallery/gallery.module';
+import { DynamodbModule } from './dynamodb/dynamodb.module';
+import { PictureModule } from './apis/picture/picture.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(envConfig),
-    GalleryModule
+    DynamodbModule,
+    PictureModule
   ],
   controllers: [],
   providers: [],
