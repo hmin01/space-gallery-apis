@@ -89,6 +89,17 @@ export const handler = async (event) => {
         if (result.Count) body = result.Items.sort((a, b) => b.timestamp - a.timestamp);
         else body = [];
         break;
+      case "GET /pictures/timestamp":
+        // 데이터 조회를 위한 명령 생성
+        command = new ScanCommand({
+          TableName: process.env.TABLE_NAME
+        });
+        // 데이터 조회
+        result = await dynamodb.send(command);
+        // 결과 가공 및 반환
+        if (result.Count) body = result.Items.map((elem) => elem.timestamp).sort();
+        else body = [];
+        break;
       default:
         throw new Error(`Unsupported route: ${event.routeKey}`);
     }
