@@ -32,6 +32,7 @@ export async function createPhoto(client, date) {
   const command = new PutCommand({
     TableName: process.env.TABLE_NAME,
     Item: {
+      copyright: data.copyright ?? "",
       dataUrl,
       explanation: data.explanation,
       id: transformToTimestamp(date),
